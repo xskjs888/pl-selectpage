@@ -213,7 +213,12 @@
      */
     var SelectPage = function (input, option) {
         //特殊字段处理
-        $.each({data: 'source', keyField: 'primaryKey', showField: 'field', pageSize: 'perPage'}, function (i, j) {
+        $.each({
+            data: 'source',
+            keyField: 'primaryKey',
+            showField: 'field',
+            pageSize: 'perPage'
+        }, function (i, j) {
             if (typeof option[j] !== 'undefined') {
                 option[i] = option[j];
                 delete option[j];
@@ -296,7 +301,8 @@
      * @return {Array}
      */
     SelectPage.prototype.setOrderbyOption = function (arg_order, arg_field) {
-        var arr = [], orders = [];
+        var arr = [],
+            orders = [];
         if (typeof arg_order == 'object') {
             for (var i = 0; i < arg_order.length; i++) {
                 orders = $.trim(arg_order[i]).split(' ');
@@ -468,7 +474,11 @@
             includeMargin: false,
             display: 'block'
         };
-        var configs = defaults, $target = element.eq(0), fix, restore, tmp = [], style = '', $hidden;
+        var configs = defaults,
+            $target = element.eq(0),
+            fix, restore, tmp = [],
+            style = '',
+            $hidden;
 
         fix = function () {
             // get all hidden parents
@@ -482,7 +492,8 @@
             // set the hidden el css to be got the actual value later
             $hidden.each(function () {
                 // Save original style. If no style was set, attr() returns undefined
-                var $this = $(this), thisStyle = $this.attr('style');
+                var $this = $(this),
+                    thisStyle = $this.attr('style');
                 tmp.push(thisStyle);
                 // Retain as much of the original style as possible, if there is one
                 $this.attr('style', thisStyle ? thisStyle + ';' + style : style);
@@ -492,7 +503,8 @@
         restore = function () {
             // restore origin style values
             $hidden.each(function (i) {
-                var $this = $(this), _tmp = tmp[ i ];
+                var $this = $(this),
+                    _tmp = tmp[i];
 
                 if (_tmp === undefined)
                     $this.removeAttr('style');
@@ -506,8 +518,8 @@
         // it can be 'width', 'height', 'outerWidth', 'innerWidth'... etc
         // configs.includeMargin only works for 'outerWidth' and 'outerHeight'
         var actual = /(outer)/.test(method) ?
-                $target[ method ](configs.includeMargin) :
-                $target[ method ]();
+            $target[method](configs.includeMargin) :
+            $target[method]();
 
         restore();
         // IMPORTANT, this plugin only return the value of the first element
@@ -520,7 +532,11 @@
      */
     SelectPage.prototype.setElem = function (combo_input) {
         // 1. build Dom object
-        var elem = {}, p = this.option, css = this.css_class, msg = this.message, input = $(combo_input);
+        var elem = {},
+            p = this.option,
+            css = this.css_class,
+            msg = this.message,
+            input = $(combo_input);
         var orgWidth = input.outerWidth();
         // fix input width in hidden situation
         if (orgWidth <= 0)
@@ -528,7 +544,9 @@
         if (orgWidth < 150)
             orgWidth = 150;
 
-        elem.combo_input = input.attr({'autocomplete': 'off'}).addClass(css.input).wrap('<div>');
+        elem.combo_input = input.attr({
+            'autocomplete': 'off'
+        }).addClass(css.input).wrap('<div>');
         if (p.selectOnly)
             elem.combo_input.prop('readonly', true);
         elem.container = elem.combo_input.parent().addClass(css.container);
@@ -562,10 +580,10 @@
         elem.results = $('<ul>').addClass(css.results);
 
         var namePrefix = '_text',
-                input_id = elem.combo_input.attr('id') || elem.combo_input.attr('name'),
-                input_name = elem.combo_input.attr('name') || 'selectPage',
-                hidden_name = input_name,
-                hidden_id = input_id;
+            input_id = elem.combo_input.attr('id') || elem.combo_input.attr('name'),
+            input_name = elem.combo_input.attr('name') || 'selectPage',
+            hidden_name = input_name,
+            hidden_id = input_id;
 
         //switch the id and name attributes of input/hidden element
         elem.hidden = $('<input type="hidden" class="sp_hidden" />').attr({
@@ -642,7 +660,10 @@
      * <input data-init="key">
      */
     SelectPage.prototype.setInitRecord = function (refresh) {
-        var self = this, p = self.option, el = self.elem, key = '';
+        var self = this,
+            p = self.option,
+            el = self.elem,
+            key = '';
         if ($.type(el.combo_input.data('init')) != 'undefined')
             p.initRecord = String(el.combo_input.data('init'));
         //data-init and value attribute can be init plugin selected item
@@ -668,7 +689,7 @@
                 if (!p.multiple && data.length > 1)
                     data = [data[0]];
                 self.afterInit(self, data);
-            } else {//ajax data source mode to init selected item
+            } else { //ajax data source mode to init selected item
                 $.ajax({
                     dataType: 'json',
                     type: 'POST',
@@ -707,15 +728,15 @@
             return;
         if (!$.isArray(data))
             data = [data];
-        var p = self.option, css = self.css_class;
+        var p = self.option,
+            css = self.css_class;
 
         var getText = function (row) {
             var text = row[p.showField];
             if (p.formatItem && $.isFunction(p.formatItem)) {
                 try {
                     text = p.formatItem(row);
-                } catch (e) {
-                }
+                } catch (e) {}
             }
             return text;
         };
@@ -724,13 +745,15 @@
             self.prop.init_set = true;
             self.clearAll(self);
             $.each(data, function (i, row) {
-                var item = {text: getText(row), value: row[p.keyField]};
+                var item = {
+                    text: getText(row),
+                    value: row[p.keyField]
+                };
                 if (!self.isAlreadySelected(self, item))
                     self.addNewTag(self, item);
             });
             self.tagValuesSet(self);
             self.inputResize(self);
-            console.log(self.elem.hidden.blur());
             self.prop.init_set = false;
         } else {
             var row = data[0];
@@ -765,7 +788,10 @@
      * Events bind
      */
     SelectPage.prototype.eInput = function () {
-        var self = this, p = self.option, el = self.elem, msg = self.message;
+        var self = this,
+            p = self.option,
+            el = self.elem,
+            msg = self.message;
         var showList = function () {
             self.prop.page_move = false;
             self.suggest(self);
@@ -843,7 +869,8 @@
      * Out of plugin area click event handler
      */
     SelectPage.prototype.eWhole = function () {
-        var self = this, css = self.css_class;
+        var self = this,
+            css = self.css_class;
         var cleanContent = function (obj) {
             obj.elem.combo_input.val('');
             if (!obj.option.multiple)
@@ -859,10 +886,11 @@
             $('div.' + css.container + '.' + css.container_open).each(function () {
                 if (this == sp[0])
                     return;
-                var $this = $(this), d = $this.find('input.' + css.input).data(SelectPage.dataKey);
+                var $this = $(this),
+                    d = $this.find('input.' + css.input).data(SelectPage.dataKey);
 
                 if (!d.elem.combo_input.val() && d.elem.hidden.val() && !d.option.multiple) {
-                    d.prop.current_page = 1;//reset page to 1
+                    d.prop.current_page = 1; //reset page to 1
                     cleanContent(d);
                     d.hideResults(d);
                     return true;
@@ -901,7 +929,8 @@
      * Result list event bind
      */
     SelectPage.prototype.eResultList = function () {
-        var self = this, css = this.css_class;
+        var self = this,
+            css = this.css_class;
         self.elem.results.children('li').hover(function () {
             if (self.prop.key_select) {
                 self.prop.key_select = false;
@@ -930,23 +959,25 @@
      * Reposition result list when list beyond the visible area
      */
     SelectPage.prototype.eScroll = function () {
-        var self = this, css = this.css_class;
+        var self = this,
+            css = this.css_class;
         $(window).on('scroll.SelectPage', function (e) {
             $('div.' + css.container + '.' + css.container_open).each(function () {
-                var $this = $(this), d = $this.find('input.' + css.input).data(SelectPage.dataKey),
-                        offset = d.elem.result_area.offset(),
-                        screenScrollTop = $(window).scrollTop(),
-                        docHeight = $(document).height(),
-                        viewHeight = $(window).height(),
-                        listHeight = d.elem.result_area.outerHeight(),
-                        listBottom = offset.top + listHeight,
-                        hasOverflow = docHeight > viewHeight,
-                        down = d.elem.result_area.hasClass('shadowDown');
+                var $this = $(this),
+                    d = $this.find('input.' + css.input).data(SelectPage.dataKey),
+                    offset = d.elem.result_area.offset(),
+                    screenScrollTop = $(window).scrollTop(),
+                    docHeight = $(document).height(),
+                    viewHeight = $(window).height(),
+                    listHeight = d.elem.result_area.outerHeight(),
+                    listBottom = offset.top + listHeight,
+                    hasOverflow = docHeight > viewHeight,
+                    down = d.elem.result_area.hasClass('shadowDown');
                 if (hasOverflow) {
-                    if (down) {//open down
+                    if (down) { //open down
                         if (listBottom > (viewHeight + screenScrollTop))
                             d.calcResultsSize(d);
-                    } else {//open up
+                    } else { //open up
                         if (offset.top < screenScrollTop)
                             d.calcResultsSize(d);
                     }
@@ -1020,15 +1051,15 @@
      */
     SelectPage.prototype.scrollWindow = function (self, enforce) {
         var current_result = self.getCurrentLine(self),
-                target_top = (current_result && !enforce) ? current_result.offset().top : self.elem.container.offset().top,
-                target_size;
+            target_top = (current_result && !enforce) ? current_result.offset().top : self.elem.container.offset().top,
+            target_size;
 
         self.prop.size_li = self.elem.results.children('li:first').outerHeight();
         target_size = self.prop.size_li;
 
         var gap, client_height = $(window).height(),
-                scroll_top = $(window).scrollTop(),
-                scroll_bottom = scroll_top + client_height - target_size;
+            scroll_top = $(window).scrollTop(),
+            scroll_bottom = scroll_top + client_height - target_size;
         if (current_result.length) {
             if (target_top < scroll_top || target_size > client_height) {
                 //scroll to top
@@ -1048,7 +1079,8 @@
      * @param status {boolean} true: open, false: close
      */
     SelectPage.prototype.setOpenStatus = function (self, status) {
-        var el = self.elem, css = self.css_class;
+        var el = self.elem,
+            css = self.css_class;
         if (status) {
             el.container.addClass(css.container_open);
             el.result_area.addClass(css.result_open);
@@ -1127,44 +1159,44 @@
      */
     SelectPage.prototype.processControl = function (self, e) {
         if (($.inArray(e.keyCode, [37, 38, 39, 40, 27, 9]) > -1 && self.elem.result_area.is(':visible')) ||
-                ($.inArray(e.keyCode, [13, 9]) > -1 && self.getCurrentLine(self))) {
+            ($.inArray(e.keyCode, [13, 9]) > -1 && self.getCurrentLine(self))) {
             e.preventDefault();
             e.stopPropagation();
             e.cancelBubble = true;
             e.returnValue = false;
             switch (e.keyCode) {
-                case 37:// left
+                case 37: // left
                     if (e.shiftKey)
                         self.firstPage(self);
                     else
                         self.prevPage(self);
                     break;
-                case 38:// up
+                case 38: // up
                     self.prop.key_select = true;
                     self.prevLine(self);
                     break;
-                case 39:// right
+                case 39: // right
                     if (e.shiftKey)
                         self.lastPage(self);
                     else
                         self.nextPage(self);
                     break;
-                case 40:// down
+                case 40: // down
                     if (self.elem.results.children('li').length) {
                         self.prop.key_select = true;
                         self.nextLine(self);
                     } else
                         self.suggest(self);
                     break;
-                case 9:// tab
+                case 9: // tab
                     self.prop.key_paging = true;
                     self.selectCurrentLine(self, true);
                     //self.hideResults(self);
                     break;
-                case 13:// return
+                case 13: // return
                     self.selectCurrentLine(self, true);
                     break;
-                case 27://  escape
+                case 27: //  escape
                     self.prop.key_paging = true;
                     self.hideResults(self);
                     break;
@@ -1234,7 +1266,9 @@
         var p = self.option;
         if (!p.eAjaxSuccess || !$.isFunction(p.eAjaxSuccess))
             self.hideResults(self);
-        var _paramsFunc = p.params, _params = {}, searchKey = p.searchField;
+        var _paramsFunc = p.params,
+            _params = {},
+            searchKey = p.searchField;
         //when have new query keyword, then reset page number to 1.
         if (q_word.length && q_word[0] && q_word[0] !== self.prop.prev_value)
             which_page_num = 1;
@@ -1270,7 +1304,8 @@
                     self.ajaxErrorNotify(self, errorThrown);
                     return;
                 }
-                var data = {}, json = {};
+                var data = {},
+                    json = {};
                 try {
                     data = p.eAjaxSuccess(returnData);
                     json.originalResult = data.list;
@@ -1279,10 +1314,10 @@
                     self.showMessage(self, self.message.ajax_error);
                     return;
                 }
-                if(self.elem.navi) {
+                if (self.elem.navi) {
                     $(self.elem.navi).toggleClass("hide", json.cnt_whole <= json.originalResult.length);
                 }
-                
+
                 json.candidate = [];
                 json.keyField = [];
                 if (typeof json.originalResult != 'object') {
@@ -1322,7 +1357,13 @@
      * @param {number} which_page_num
      */
     SelectPage.prototype.searchForJson = function (self, q_word, which_page_num) {
-        var p = self.option, matched = [], esc_q = [], sorted = [], json = {}, i = 0, arr_reg = [];
+        var p = self.option,
+            matched = [],
+            esc_q = [],
+            sorted = [],
+            json = {},
+            i = 0,
+            arr_reg = [];
 
         //query keyword filter
         do {
@@ -1335,7 +1376,9 @@
 
         // SELECT * FROM data WHERE field LIKE q_word;
         for (i = 0; i < p.data.length; i++) {
-            var flag = false, row = p.data[i], itemText;
+            var flag = false,
+                row = p.data[i],
+                itemText;
             for (var j = 0; j < arr_reg.length; j++) {
                 itemText = row[p.searchField];
                 if (p.formatItem && $.isFunction(p.formatItem))
@@ -1356,8 +1399,10 @@
 
         // (CASE WHEN ...) then く order some column
         var reg1 = new RegExp('^' + esc_q[0] + '$', 'gi'),
-                reg2 = new RegExp('^' + esc_q[0], 'gi'),
-                matched1 = [], matched2 = [], matched3 = [];
+            reg2 = new RegExp('^' + esc_q[0], 'gi'),
+            matched1 = [],
+            matched2 = [],
+            matched3 = [];
         for (i = 0; i < matched.length; i++) {
             var orderField = p.orderBy[0][0];
             var orderValue = String(matched[i][orderField]);
@@ -1417,7 +1462,8 @@
         }
 
         //LIMIT xx OFFSET xx
-        var start = (which_page_num - 1) * p.pageSize, end = start + p.pageSize;
+        var start = (which_page_num - 1) * p.pageSize,
+            end = start + p.pageSize;
         //save original data
         json.originalResult = [];
         //after data filter handle
@@ -1452,7 +1498,8 @@
      */
     SelectPage.prototype.sortAsc = function (self, arr) {
         arr.sort(function (a, b) {
-            var valA = a[self.option.orderBy[0][0]], valB = b[self.option.orderBy[0][0]];
+            var valA = a[self.option.orderBy[0][0]],
+                valB = b[self.option.orderBy[0][0]];
             return $.type(valA) === 'number' ? valA - valB : String(valA).localeCompare(String(valB));
         });
         return arr;
@@ -1465,7 +1512,8 @@
      */
     SelectPage.prototype.sortDesc = function (self, arr) {
         arr.sort(function (a, b) {
-            var valA = a[self.option.orderBy[0][0]], valB = b[self.option.orderBy[0][0]];
+            var valA = a[self.option.orderBy[0][0]],
+                valB = b[self.option.orderBy[0][0]];
             return $.type(valA) === 'number' ? valB - valA : String(valB).localeCompare(String(valA));
         });
         return arr;
@@ -1526,9 +1574,9 @@
             if (pagebar.find('li').size() === 0) {
                 pagebar.hide().empty();
                 var iconFist = 'spfont sp-first',
-                        iconPrev = 'spfont sp-previous',
-                        iconNext = 'spfont sp-next',
-                        iconLast = 'spfont sp-last';
+                    iconPrev = 'spfont sp-previous',
+                    iconNext = 'spfont sp-next',
+                    iconLast = 'spfont sp-last';
 
                 pagebar.append('<li class="csFirstPage" title="' + msg.first_title + '" ><a href="javascript:void(0);"> <i class="' + iconFist + '"></i> </a></li>');
                 pagebar.append('<li class="csPreviousPage" title="' + msg.prev_title + '" ><a href="javascript:void(0);"><i class="' + iconPrev + '"></i></a></li>');
@@ -1544,7 +1592,7 @@
         };
 
         var pagebar = self.elem.navi.find('ul'),
-                last_page = Math.ceil(cnt_whole / self.option.pageSize); //calculate total page
+            last_page = Math.ceil(cnt_whole / self.option.pageSize); //calculate total page
         if (last_page === 0)
             page_num = 0;
         else {
@@ -1553,16 +1601,16 @@
             else if (page_num === 0)
                 page_num = 1;
         }
-        self.prop.current_page = page_num;//update current page number
-        self.prop.max_page = last_page;//update page count
+        self.prop.current_page = page_num; //update current page number
+        self.prop.max_page = last_page; //update page count
         buildPageNav(self, pagebar, page_num, last_page);
 
         //update paging status
         var dClass = 'disabled',
-                first = pagebar.find('li.csFirstPage'),
-                previous = pagebar.find('li.csPreviousPage'),
-                next = pagebar.find('li.csNextPage'),
-                last = pagebar.find('li.csLastPage');
+            first = pagebar.find('li.csFirstPage'),
+            previous = pagebar.find('li.csPreviousPage'),
+            next = pagebar.find('li.csNextPage'),
+            last = pagebar.find('li.csLastPage');
         //first and previous
         if (page_num === 1 || page_num === 0) {
             if (!first.hasClass(dClass))
@@ -1599,7 +1647,8 @@
      * @param {boolean} is_query - used to different from search to open and just click to open
      */
     SelectPage.prototype.displayResults = function (self, json, is_query) {
-        var p = self.option, el = self.elem;
+        var p = self.option,
+            el = self.elem;
         el.results.hide().empty();
         if (p.multiple && $.type(p.maxSelectLimit) === 'number' && p.maxSelectLimit > 0) {
             var selectedSize = el.element_box.find('li.selected_tag').size();
@@ -1612,10 +1661,10 @@
 
         if (json.candidate.length) {
             var arr_candidate = json.candidate,
-                    arr_primary_key = json.keyField,
-                    keystr = el.hidden.val(),
-                    keyArr = keystr ? keystr.split(',') : new Array(),
-                    itemText = '';
+                arr_primary_key = json.keyField,
+                keystr = el.hidden.val(),
+                keyArr = keystr ? keystr.split(',') : new Array(),
+                itemText = '';
             for (var i = 0; i < arr_candidate.length; i++) {
                 if (p.formatItem && $.isFunction(p.formatItem)) {
                     try {
@@ -1642,7 +1691,7 @@
             }
         } else {
             var li = '<li class="' + self.css_class.message_box + '"><i class="spfont sp-warning"></i> ' +
-                    self.message.not_found + '</li>';
+                self.message.not_found + '</li>';
             el.results.append(li);
         }
         el.results.show();
@@ -1668,7 +1717,8 @@
      * @param {Object} self
      */
     SelectPage.prototype.calcResultsSize = function (self) {
-        var p = self.option, el = self.elem;
+        var p = self.option,
+            el = self.elem;
         var rePosition = function () {
             if (el.container.css('position') === 'static') {
                 // position: static
@@ -1680,7 +1730,7 @@
             } else {
                 if (!p.pagination) {
                     var itemHeight = el.results.find('li:first').outerHeight(true),
-                            listHeight = itemHeight * p.listSize;
+                        listHeight = itemHeight * p.listSize;
                     el.results.css({
                         'max-height': listHeight,
                         'overflow-y': 'auto'
@@ -1689,30 +1739,31 @@
 
                 //handle result list show up side(left, right, up or down)
                 var docWidth = $(document).width(),
-                        docHeight = $(document).height(), //the document full height
-                        viewHeight = $(window).height(), //browser visible area height
-                        offset = el.container.offset(),
-                        screenScrollTop = $(window).scrollTop(),
-                        listWidth = el.result_area.outerWidth(),
-                        //result list height
-                        listHeight = el.result_area.outerHeight(),
-                        //default left used input element left
-                        defaultLeft = offset.left, //p.multiple ? -1 : 0;
-                        //input element height
-                        inputHeight = el.container.outerHeight(),
-                        left = (offset.left + listWidth) > docWidth ?
-                        defaultLeft - (listWidth - el.container.outerWidth()) :
-                        defaultLeft,
-                        //the actual top coordinate of input element(outer div)
-                        screenTop = offset.top, //$(el.container).scrollTop();//offset.top - screenScrollTop;
-                        top = 0, dist = 5, //set distance between input element and result list
-                        //the actual top coordinate of result list
-                        listBottom = screenTop + inputHeight + listHeight + dist,
-                        hasOverflow = docHeight > viewHeight;
+                    docHeight = $(document).height(), //the document full height
+                    viewHeight = $(window).height(), //browser visible area height
+                    offset = el.container.offset(),
+                    screenScrollTop = $(window).scrollTop(),
+                    listWidth = el.result_area.outerWidth(),
+                    //result list height
+                    listHeight = el.result_area.outerHeight(),
+                    //default left used input element left
+                    defaultLeft = offset.left, //p.multiple ? -1 : 0;
+                    //input element height
+                    inputHeight = el.container.outerHeight(),
+                    left = (offset.left + listWidth) > docWidth ?
+                    defaultLeft - (listWidth - el.container.outerWidth()) :
+                    defaultLeft,
+                    //the actual top coordinate of input element(outer div)
+                    screenTop = offset.top, //$(el.container).scrollTop();//offset.top - screenScrollTop;
+                    top = 0,
+                    dist = 5, //set distance between input element and result list
+                    //the actual top coordinate of result list
+                    listBottom = screenTop + inputHeight + listHeight + dist,
+                    hasOverflow = docHeight > viewHeight;
 
                 if ((screenTop - screenScrollTop - dist > listHeight) &&
-                        (hasOverflow && listBottom > (viewHeight + screenScrollTop)) ||
-                        (!hasOverflow && listBottom > viewHeight)) {
+                    (hasOverflow && listBottom > (viewHeight + screenScrollTop)) ||
+                    (!hasOverflow && listBottom > viewHeight)) {
                     //open up
                     top = offset.top - listHeight - dist;
                     el.result_area.removeClass('shadowUp shadowDown').addClass('shadowUp');
@@ -1723,7 +1774,8 @@
                     top += dist;
                 }
                 return {
-                    top: top + 'px', left: left + 'px'
+                    top: top + 'px',
+                    left: left + 'px'
                 };
             }
         };
@@ -1770,7 +1822,8 @@
      * @param disabled
      */
     SelectPage.prototype.disabled = function (self, disabled) {
-        var p = self.option, el = self.elem;
+        var p = self.option,
+            el = self.elem;
         if ($.type(disabled) === 'undefined')
             return el.combo_input.prop('disabled');
         if ($.type(disabled) === 'boolean') {
@@ -1861,7 +1914,8 @@
     SelectPage.prototype.selectCurrentLine = function (self, is_enter_key) {
         self.scrollWindow(self, true);
 
-        var p = self.option, current = self.getCurrentLine(self);
+        var p = self.option,
+            current = self.getCurrentLine(self);
         if (current) {
             if (!p.multiple) {
                 self.elem.combo_input.val(current.text());
@@ -1869,7 +1923,10 @@
             } else {
                 //build tags in multiple selection mode
                 self.elem.combo_input.val('');
-                var item = {text: current.text(), value: current.attr('pkey')};
+                var item = {
+                    text: current.text(),
+                    value: current.attr('pkey')
+                };
                 if (!self.isAlreadySelected(self, item)) {
                     self.addNewTag(self, item);
                     self.tagValuesSet(self);
@@ -1902,10 +1959,14 @@
      * @param {Object} self
      */
     SelectPage.prototype.selectAllLine = function (self) {
-        var p = self.option, jsonarr = new Array();
+        var p = self.option,
+            jsonarr = new Array();
         self.elem.results.find('li').each(function (i, row) {
             var $row = $(row);
-            var item = {text: $row.text(), value: $row.attr('pkey')};
+            var item = {
+                text: $row.text(),
+                value: $row.attr('pkey')
+            };
             if (!self.isAlreadySelected(self, item)) {
                 self.addNewTag(self, item);
                 self.tagValuesSet(self);
@@ -1913,8 +1974,8 @@
             jsonarr.push($row.data('dataObj'));
             //limited max selected items
             if ($.type(p.maxSelectLimit) === 'number' &&
-                    p.maxSelectLimit > 0 &&
-                    p.maxSelectLimit === self.elem.element_box.find('li.selected_tag').size()) {
+                p.maxSelectLimit > 0 &&
+                p.maxSelectLimit === self.elem.element_box.find('li.selected_tag').size()) {
                 return false;
             }
         });
@@ -1927,7 +1988,8 @@
      * @param {Object} self
      */
     SelectPage.prototype.unSelectAllLine = function (self) {
-        var p = self.option, size = self.elem.results.find('li').size();
+        var p = self.option,
+            size = self.elem.results.find('li').size();
         self.elem.results.find('li').each(function (i, row) {
             var key = $(row).attr('pkey');
             var tag = self.elem.element_box.find('li.selected_tag[itemvalue="' + key + '"]');
@@ -1942,7 +2004,8 @@
      * @param {Object} self
      */
     SelectPage.prototype.clearAll = function (self) {
-        var p = self.option, size = 0;
+        var p = self.option,
+            size = 0;
         if (p.multiple) {
             size = self.elem.element_box.find('li.selected_tag').size();
             self.elem.element_box.find('li.selected_tag').remove();
@@ -2009,7 +2072,8 @@
     SelectPage.prototype.addNewTag = function (self, item) {
         if (!self.option.multiple || !item)
             return;
-        var tmp = self.template.tag.content, tag;
+        var tmp = self.template.tag.content,
+            tag;
         tmp = tmp.replace(self.template.tag.textKey, item.text);
         tmp = tmp.replace(self.template.tag.valueKey, item.value);
         tag = $(tmp);
@@ -2027,7 +2091,7 @@
         var keys = self.elem.hidden.val();
         if ($.type(key) != 'undefined' && keys) {
             var keyarr = keys.split(','),
-                    index = $.inArray(key.toString(), keyarr);
+                index = $.inArray(key.toString(), keyarr);
             if (index != -1) {
                 keyarr.splice(index, 1);
                 self.elem.hidden.val(keyarr.toString());
@@ -2066,11 +2130,11 @@
         if (!self.option.multiple)
             return;
         var width = '',
-                inputLi = self.elem.combo_input.closest('li');
+            inputLi = self.elem.combo_input.closest('li');
         var setDefaultSize = function (self, inputLi) {
             inputLi.removeClass('full_width');
             var minimumWidth = self.elem.combo_input.val().length + 1,
-                    width = (minimumWidth * 0.75) + 'em';
+                width = (minimumWidth * 0.75) + 'em';
             self.elem.combo_input.css('width', width).removeAttr('placeholder');
         };
         if (self.elem.element_box.find('li.selected_tag').size() === 0) {
@@ -2089,7 +2153,8 @@
      * @param {Object} self
      */
     SelectPage.prototype.nextLine = function (self) {
-        var obj = self.getCurrentLine(self), idx;
+        var obj = self.getCurrentLine(self),
+            idx;
         if (!obj)
             idx = -1;
         else {
@@ -2111,7 +2176,8 @@
      * @param {Object} self
      */
     SelectPage.prototype.prevLine = function (self) {
-        var obj = self.getCurrentLine(self), idx;
+        var obj = self.getCurrentLine(self),
+            idx;
         if (!obj)
             idx = self.elem.results.children('li').length;
         else {
@@ -2137,8 +2203,8 @@
     function Plugin(option) {
         return this.each(function () {
             var $this = $(this),
-                    data = $this.data(SelectPage.dataKey),
-                    params = $.extend({}, defaults, $this.data(), data && data.option, typeof option === 'object' && option);
+                data = $this.data(SelectPage.dataKey),
+                params = $.extend({}, defaults, $this.data(), data && data.option, typeof option === 'object' && option);
             if (!data)
                 $this.data(SelectPage.dataKey, (data = new SelectPage(this, params)));
         });
@@ -2159,7 +2225,7 @@
     function ClearSelected() {
         return this.each(function () {
             var $this = getPlugin(this),
-                    data = $this.data(SelectPage.dataKey);
+                data = $this.data(SelectPage.dataKey);
             if (data) {
                 data.prop.init_set = true;
                 data.clearAll(data);
@@ -2177,7 +2243,7 @@
     function SelectedRefresh() {
         return this.each(function () {
             var $this = getPlugin(this),
-                    data = $this.data(SelectPage.dataKey);
+                data = $this.data(SelectPage.dataKey);
             if (data && data.elem.hidden.val())
                 data.setInitRecord(true);
         });
@@ -2193,7 +2259,7 @@
         return this.each(function () {
             if (data && $.isArray(data)) {
                 var $this = getPlugin(this),
-                        plugin = $this.data(SelectPage.dataKey);
+                    plugin = $this.data(SelectPage.dataKey);
                 if (plugin) {
                     plugin.clearAll(plugin);
                     plugin.option.data = data;
@@ -2210,7 +2276,7 @@
         var status = false;
         this.each(function () {
             var $this = getPlugin(this),
-                    plugin = $this.data(SelectPage.dataKey);
+                plugin = $this.data(SelectPage.dataKey);
             if (plugin) {
                 if ($.type(disabled) !== 'undefined')
                     plugin.disabled(plugin, disabled);
@@ -2228,7 +2294,8 @@
     function GetInputText() {
         var str = '';
         this.each(function () {
-            var $this = getPlugin(this), data = $this.data(SelectPage.dataKey);
+            var $this = getPlugin(this),
+                data = $this.data(SelectPage.dataKey);
             if (data) {
                 if (data.option.multiple) {
                     var tags = [];
